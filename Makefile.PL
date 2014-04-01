@@ -10,4 +10,5 @@ requires 'RT::Extension::MergeUsers';
 test_requires 'Test::More';
 
 sign;
+auto_install;
 WriteAll;
