@@ -1,0 +1,8 @@
+<%init>
+    my $admin_tools = Menu->child('admin')->child('tools');
+    $admin_tools->child( 'autocreated-users' =>
+        title       => loc('Auto-created Users'),
+        description => loc('Manage auto-created users'),
+        path        => '/Admin/Tools/AutoCreatedUsers.html',
+    );
+</%init>
