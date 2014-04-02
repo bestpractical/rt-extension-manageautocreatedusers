@@ -16,6 +16,16 @@ sub get_autocreated_users {
     return $users;
 }
 
+sub get_watching_tickets_for {
+    my ( $class, $email_address ) = @_;
+    my $tickets = RT::Tickets->new(RT->SystemUser);
+    $tickets->LimitWatcher(
+        OPERATOR => '=',
+        VALUE => $email_address,
+    );
+    return $tickets;
+}
+
 =head1 NAME
 
 RT-Extension-ManageAutoCreatedUsers - Manage auto-created users

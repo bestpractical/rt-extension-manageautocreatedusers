@@ -1,0 +1,35 @@
+<%args>
+$COLUMN_MAP
+</%args>
+
+<%init>
+$COLUMN_MAP->{'WatchingTickets'} = {
+        title => 'Watching tickets', # loc
+        value => sub {
+            my @res;
+            my $tickets = RT::Extension::ManageAutoCreatedUsers->get_watching_tickets_for(
+                $_[0]->EmailAddress
+            );
+            while ( my $ticket = $tickets->Next ) {
+                push @res, ', ' if @res;
+                push @res, \'<a href="', RT->Config->Get('WebPath'), '/Ticket/Display.html';
+                push @res, '?id='. $ticket->id;
+                push @res, \'" title="', $ticket->Subject, \'">#', $ticket->id, \'</a>';
+            }
+            return @res;
+        },
+    };
+
+$COLUMN_MAP->{'Action'} = {
+        title => 'Action', # loc
+        value => sub {
+            my @res = (\'<select name="action">');
+            my @actions = qw(validate shred replace merge);
+            foreach my $op_value (@actions) {
+                my $op_label = ucfirst $op_value;
+                push @res, \qq{<option value="$op_value">$op_label</option>};
+            }
+            return @res;
+        },
+    };
+</%init>

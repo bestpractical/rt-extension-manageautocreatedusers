@@ -10,6 +10,7 @@ unless ($session{'CurrentUser'}->HasRight( Object=> $RT::System, Right => 'Super
 
 my $format_config = RT->Config->Get('AdminSearchResultFormat')->{'Users'};
 $format_config =~ s/__RealName__\,\s+//;
+$format_config .= q{,__WatchingTickets__,__Action__};
 $Format ||= $format_config;
 
 my $manager = 'RT::Extension::ManageAutoCreatedUsers';
@@ -23,6 +24,7 @@ my $users = $manager->get_autocreated_users;
 
 % if ( $users->Count ) {
 
+<form name="manage-autocreated-users" action="" method="POST">
 <& /Elements/CollectionList,
     OrderBy => 'Name',
     Order => 'ASC',
@@ -33,6 +35,7 @@ my $users = $manager->get_autocreated_users;
     AllowSorting => 1,
     PassArguments => [qw(Format Rows Page Order OrderBy)],
 &>
+</form>
 
 % } else {
 
