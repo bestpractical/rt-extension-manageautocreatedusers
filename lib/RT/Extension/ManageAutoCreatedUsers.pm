@@ -5,6 +5,17 @@ use warnings;
 
 our $VERSION = '0.01';
 
+sub get_autocreated_users {
+    my $class = shift;
+    my $users = RT::Users->new(RT->SystemUser);
+    $users->Limit(
+        FIELD => 'Comments',
+        OPERATOR => 'STARTSWITH',
+        VALUE => 'Autocreated',
+    );
+    return $users;
+}
+
 =head1 NAME
 
 RT-Extension-ManageAutoCreatedUsers - Manage auto-created users

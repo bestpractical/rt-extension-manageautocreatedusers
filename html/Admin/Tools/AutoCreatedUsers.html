@@ -1,12 +1,43 @@
+<%args>
+$Format => undef
+</%args>
+
 <%init>
 my $title = loc('Manage auto-created users');
 unless ($session{'CurrentUser'}->HasRight( Object=> $RT::System, Right => 'SuperUser')) {
  Abort(loc('This feature is only available to system administrators.'));
 }
+
+my $format_config = RT->Config->Get('AdminSearchResultFormat')->{'Users'};
+$format_config =~ s/__RealName__\,\s+//;
+$Format ||= $format_config;
+
+my $manager = 'RT::Extension::ManageAutoCreatedUsers';
+my $users = $manager->get_autocreated_users;
 </%init>
+
 <& /Admin/Elements/Header, Title => $title &>
 <& /Elements/Tabs &>
 
 <&|/Widgets/TitleBox, title => loc('Auto-created Users') &>
+
+% if ( $users->Count ) {
+
+<& /Elements/CollectionList,
+    OrderBy => 'Name',
+    Order => 'ASC',
+    Rows  => 100,
+    %ARGS,
+    Format => $Format,
+    Collection => $users,
+    AllowSorting => 1,
+    PassArguments => [qw(Format Rows Page Order OrderBy)],
+&>
+
+% } else {
+
+<p><i><&|/l&>(No users)</&></i></p>
+
+% }
 
 </&>
