@@ -26,6 +26,26 @@ sub get_watching_tickets_for {
     return $tickets;
 }
 
+sub get_merge_suggestion_for {
+    my ( $class, $email_address ) = @_;
+    my $address = Email::Address->new(undef, $email_address);
+    my $username = $address->user;
+    my $mail_domain = RT->Config->Get('RTxAutoUserMailDomain');
+
+    my $users = RT::Users->new(RT->SystemUser);
+    $users->Limit(
+        FIELD => 'EmailAddress',
+        OPERATOR => 'ENDSWITH',
+        VALUE => $mail_domain,
+    );
+    while ( my $user = $users->Next ) {
+        return $user if $user->EmailAddress =~ qr{$username};
+    }
+
+    $users->GotoFirstItem;
+    return $users->First;
+}
+
 =head1 NAME
 
 RT-Extension-ManageAutoCreatedUsers - Manage auto-created users
@@ -52,9 +72,9 @@ and offer the choice of:
 =back
 
 The tool attempts to supply a suggested user to merge into based on a simple
-heuristic which assumes the correct email address from the C<RTxMailDomainRegex>
-config option. If any of the options are selected, the user will not appear
-in the listing again.
+heuristic which assumes the correct email address from the
+C<RTxAutoUserMailDomain> config option. If any of the options are selected,
+the user will not appear in the listing again.
 
 =head1 RT VERSION
 
