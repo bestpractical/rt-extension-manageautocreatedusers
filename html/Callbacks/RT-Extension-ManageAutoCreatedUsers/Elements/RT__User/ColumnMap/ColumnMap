@@ -32,4 +32,11 @@ $COLUMN_MAP->{'Action'} = {
             return @res;
         },
     };
+
+$COLUMN_MAP->{'MergeUser'} = {
+        title => 'Merge into',
+        value => sub {
+            return \q{<input name="merge_user" data-autocomplete="Users" data-autocomplete-return="Name" value="" />};
+        },
+    };
 </%init>
