@@ -23,11 +23,12 @@ $COLUMN_MAP->{'WatchingTickets'} = {
 $COLUMN_MAP->{'Action'} = {
         title => 'Action', # loc
         value => sub {
-            my @res = (\'<select name="action">');
-            my @actions = qw(validate shred replace merge);
+            my $user_id = $_[0]->id;
+            my @res = (\qq{<select name="action-${user_id}">});
+            my @actions = qw(no-action avalidate shred replace merge);
             foreach my $op_value (@actions) {
                 my $op_label = ucfirst $op_value;
-                push @res, \qq{<option value="$op_value">$op_label</option>};
+                push @res, \qq{<option value="${op_value}-${user_id}">$op_label</option>};
             }
             return @res;
         },
@@ -36,7 +37,9 @@ $COLUMN_MAP->{'Action'} = {
 $COLUMN_MAP->{'MergeUser'} = {
         title => 'Merge into',
         value => sub {
-            return \q{<input name="merge_user" data-autocomplete="Users" data-autocomplete-return="Name" value="" />};
+            my $user = shift;
+            my $user_id = $user->id;
+            return \qq{<input name="merge-user-${user_id}" data-autocomplete="Users" data-autocomplete-return="Name" value="" />};
         },
     };
 </%init>
