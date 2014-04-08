@@ -2,6 +2,7 @@ package RT::Extension::ManageAutoCreatedUsers;
 
 use strict;
 use warnings;
+use Email::Address;
 
 our $VERSION = '0.01';
 
