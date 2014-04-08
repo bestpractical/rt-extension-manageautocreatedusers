@@ -43,7 +43,7 @@ $COLUMN_MAP->{'MergeUser'} = {
                 $user->EmailAddress
             );
             my $field_value = $suggested_user->EmailAddress;
-            return \qq{<input name="merge-user-${user_id}" data-autocomplete="Users" data-autocomplete-return="Name" value="" placeholder="${field_value}" />};
+            return \qq{<input name="merge-user-${user_id}" data-autocomplete="Users" data-autocomplete-return="Name" value="" size="40" placeholder="${field_value}" />};
         },
     };
 </%init>
