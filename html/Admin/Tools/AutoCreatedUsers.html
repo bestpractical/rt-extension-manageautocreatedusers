@@ -15,6 +15,9 @@ $format_config .= q{,__WatchingTickets__,__Action__,__MergeUser__};
 $Format ||= $format_config;
 
 my $manager = 'RT::Extension::ManageAutoCreatedUsers';
+if ($ARGS{'update-autocreated-users'}) {
+    $manager->process_form(\%ARGS);
+}
 my $users = $manager->get_autocreated_users;
 </%init>
 
@@ -36,7 +39,7 @@ my $users = $manager->get_autocreated_users;
     AllowSorting => 1,
     PassArguments => [qw(Format Rows Page Order OrderBy)],
 &>
-<input type="submit" class="button" value="Update users" />
+<input type="submit" class="button" name="update-autocreated-users" value="Update users" />
 </form>
 
 % } else {

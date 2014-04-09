@@ -47,6 +47,32 @@ sub get_merge_suggestion_for {
     return $users->First;
 }
 
+sub process_form {
+    my ( $class, $args ) = @_;
+    my $action_map = {
+        validate => sub {
+            my $user = RT::User->new(RT->SystemUser);
+            $user->Load(shift);
+            if ( $user->id ) {
+                my $user_comments = $user->Comments;
+                $user_comments =~ s/^(Autocreated)/Valid, $1/;
+                $user->_Set(
+                    Field => 'Comments',
+                    Value => $user_comments
+                );
+            }
+        },
+    };
+    foreach (keys %$args) {
+        if (/^action\-(\d+)/) {
+            my $user_id = $1;
+            if ( my $do_action = $action_map->{ $args->{$_} } ) {
+                $do_action->($user_id);
+            }
+        }
+    }
+}
+
 =head1 NAME
 
 RT-Extension-ManageAutoCreatedUsers - Manage auto-created users
