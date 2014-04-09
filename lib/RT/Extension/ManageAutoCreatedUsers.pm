@@ -50,6 +50,7 @@ sub get_merge_suggestion_for {
 sub process_form {
     my ( $class, $args ) = @_;
     my $action_map = {
+        'no-action' => undef,
         validate => sub {
             my $user = RT::User->new(RT->SystemUser);
             $user->Load(shift);
