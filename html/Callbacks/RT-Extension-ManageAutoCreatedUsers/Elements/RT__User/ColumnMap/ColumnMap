@@ -24,7 +24,7 @@ $COLUMN_MAP->{'Action'} = {
         value => sub {
             my $user_id = $_[0]->id;
             my @res = (\qq{<select name="action-${user_id}">});
-            my @actions = qw(no-action validate shred replace merge);
+            my @actions = $manager->get_list_of_actions;
             foreach my $op_value (@actions) {
                 my $op_label = ucfirst $op_value;
                 push @res, \qq{<option value="$op_value">$op_label</option>};

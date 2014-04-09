@@ -3,6 +3,8 @@ package RT::Extension::ManageAutoCreatedUsers;
 use strict;
 use warnings;
 use Email::Address;
+use RT::Extension::MergeUsers;
+use Email::Valid;
 
 our $VERSION = '0.01';
 
@@ -47,28 +49,49 @@ sub get_merge_suggestion_for {
     return $users->First;
 }
 
+sub get_list_of_actions { return qw(no-action validate shred replace merge) }
+
+sub _do_validate {
+    my ( $class, $user ) = @_;
+    my $user_comments = $user->Comments;
+    $user_comments =~ s/^(Autocreated)/Valid, $1/;
+    $user->_Set(
+        Field => 'Comments',
+        Value => $user_comments
+    );
+    return $user;
+}
+
+sub _do_merge {
+    my ( $class, $user, $new_email_address ) = @_;
+    return unless Email::Valid->address($new_email_address);
+
+    my $new_user = RT::User->new(RT->SystemUser);
+    $new_user->LoadByCol('EmailAddress' => $new_email_address);
+    if ( $new_user->id ) {
+        $user = $class->_do_validate($user);
+        $user->MergeInto($new_user);
+    }
+    return $new_user;
+}
+
 sub process_form {
     my ( $class, $args ) = @_;
     my $action_map = {
-        'no-action' => undef,
-        validate => sub {
-            my $user = RT::User->new(RT->SystemUser);
-            $user->Load(shift);
-            if ( $user->id ) {
-                my $user_comments = $user->Comments;
-                $user_comments =~ s/^(Autocreated)/Valid, $1/;
-                $user->_Set(
-                    Field => 'Comments',
-                    Value => $user_comments
-                );
-            }
-        },
+        map {
+            $_ => join(q{_}, '_do', $_)
+        } $class->get_list_of_actions
     };
     foreach (keys %$args) {
         if (/^action\-(\d+)/) {
             my $user_id = $1;
-            if ( my $do_action = $action_map->{ $args->{$_} } ) {
-                $do_action->($user_id);
+            my $user = RT::User->new(RT->SystemUser);
+            $user->Load($user_id);
+            if ( $user->id && (my $do_action = $action_map->{ $args->{$_} }) ) {
+                my $new_email_address = $args->{ join q{-}, 'merge-user', $user_id };
+                if ( $do_action = $class->can($do_action) ) {
+                    $do_action->($class, $user, $new_email_address);
+                }
             }
         }
     }

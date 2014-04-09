@@ -8,6 +8,7 @@ license  'gplv2';
 requires_rt '4.2.0';
 requires 'RT::Extension::MergeUsers';
 requires 'Email::Address';
+requires 'Email::Valid';
 test_requires 'Test::More';
 
 sign;
