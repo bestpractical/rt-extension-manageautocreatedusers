@@ -3,13 +3,12 @@ $COLUMN_MAP
 </%args>
 
 <%init>
+my $manager = 'RT::Extension::ManageAutoCreatedUsers';
 $COLUMN_MAP->{'WatchingTickets'} = {
         title => 'Watching tickets', # loc
         value => sub {
             my @res;
-            my $tickets = RT::Extension::ManageAutoCreatedUsers->get_watching_tickets_for(
-                $_[0]->EmailAddress
-            );
+            my $tickets = $manager->get_watching_tickets_for($_[0]->EmailAddress);
             while ( my $ticket = $tickets->Next ) {
                 push @res, ', ' if @res;
                 push @res, \'<a href="', RT->Config->Get('WebPath'), '/Ticket/Display.html';
@@ -25,10 +24,10 @@ $COLUMN_MAP->{'Action'} = {
         value => sub {
             my $user_id = $_[0]->id;
             my @res = (\qq{<select name="action-${user_id}">});
-            my @actions = qw(no-action avalidate shred replace merge);
+            my @actions = qw(no-action validate shred replace merge);
             foreach my $op_value (@actions) {
                 my $op_label = ucfirst $op_value;
-                push @res, \qq{<option value="${op_value}-${user_id}">$op_label</option>};
+                push @res, \qq{<option value="$op_value">$op_label</option>};
             }
             return @res;
         },
@@ -39,9 +38,7 @@ $COLUMN_MAP->{'MergeUser'} = {
         value => sub {
             my $user = shift;
             my $user_id = $user->id;
-            my $suggested_user = RT::Extension::ManageAutoCreatedUsers->get_merge_suggestion_for(
-                $user->EmailAddress
-            );
+            my $suggested_user = $manager->get_merge_suggestion_for($user->EmailAddress);
             my $field_value = $suggested_user->EmailAddress;
             return \qq{<input name="merge-user-${user_id}" data-autocomplete="Users" data-autocomplete-return="Name" value="" size="40" placeholder="${field_value}" />};
         },
