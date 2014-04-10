@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use Email::Address;
 use RT::Extension::MergeUsers;
-use Email::Valid;
 use Scalar::Util 'blessed';
 use Module::Runtime 'use_module';
 
@@ -122,8 +121,6 @@ sub process_form {
             my $new_email_address = $args->{
                 join q{-}, 'merge-user', $user_id
             };
-            next if $new_email_address
-                && !Email::Valid->address($new_email_address);
 
             my $new_user = RT::User->new(RT->SystemUser);
             $new_user->LoadByCol('EmailAddress' => $new_email_address);
