@@ -52,6 +52,13 @@ sub get_merge_suggestion_for {
 
 sub get_list_of_actions { return qw(no-action validate shred replace merge) }
 
+sub _get_user_by_email {
+    my ( $class, $email_address ) = @_;
+    my $user = RT::User->new(RT->SystemUser);
+    $user->LoadByEmail($email_address);
+    return $user;
+}
+
 sub _do_validate {
     my ( $class, $user ) = @_;
     my $user_comments = $user->Comments;
@@ -64,7 +71,8 @@ sub _do_validate {
 }
 
 sub _do_merge {
-    my ( $class, $user, $new_user ) = @_;
+    my ( $class, $user, $new_email_address ) = @_;
+    my $new_user = $class->_get_user_by_email($new_email_address);
     if ( $new_user->id ) {
         $user->MergeInto($new_user);
         return $new_user;
@@ -73,7 +81,8 @@ sub _do_merge {
 }
 
 sub _do_replace {
-    my ( $class, $user, $new_user ) = @_;
+    my ( $class, $user, $new_email_address ) = @_;
+    my $new_user = $class->_get_user_by_email($new_email_address);
     if ( $new_user->id ) {
         my $shred_plugin = use_module('RT::Shredder::Plugin::Users')->new;
         my ( $test_status, $msg ) = $shred_plugin->TestArgs(
@@ -115,26 +124,32 @@ sub process_form {
             $_ => join(q{_}, '_do', $_)
         } $class->get_list_of_actions
     };
-    foreach (keys %$args) {
-        if (/^action\-(\d+)/) {
-            my $user_id = $1;
+    ACTION : foreach my $param (grep { /^action/ } keys %$args) {
+        my $action = $args->{$param};
+        next ACTION if $action eq 'no-action';
+
+        my $function_name = $action_map->{$action};
+        unless ( $function_name ) {
+            RT->Logger->warn("Invalid action: $action");
+            next ACTION;
+        }
+
+        my ( $user_id ) = $param =~ /^action-(\d+)/;
+        my $user = RT::User->new(RT->SystemUser);
+        $user->Load($user_id);
+        unless ( $user->id ) {
+            RT->Logger->warn("Error loading the user: $user_id");
+            next ACTION;
+        }
+
+        if ( my $code_ref = $class->can($function_name) ) {
             my $new_email_address = $args->{
                 join q{-}, 'merge-user', $user_id
             };
-
-            my $new_user = RT::User->new(RT->SystemUser);
-            $new_user->LoadByCol('EmailAddress' => $new_email_address);
-            my $user = RT::User->new(RT->SystemUser);
-            $user->Load($user_id);
-            my $action = $args->{$_};
-            if ( $user->id && (my $do_action = $action_map->{$action}) ) {
-                if ( $do_action = $class->can($do_action) ) {
-                    my $return = $do_action->($class, $user, $new_user);
-                    RT->Logger->warn(
-                        "Error to $action user $user_id: " . $return->[1]
-                    ) unless blessed($return);
-                }
-            }
+            my $return = $code_ref->($class, $user, $new_email_address);
+            RT->Logger->warn(
+                "Error to $action user $user_id: " . $return->[1]
+            ) unless blessed($return);
         }
     }
 }
