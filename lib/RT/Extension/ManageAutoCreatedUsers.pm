@@ -62,11 +62,8 @@ sub _get_user_by_email {
 sub _do_validate {
     my ( $class, $user ) = @_;
     my $user_comments = $user->Comments;
-    $user_comments =~ s/^(Autocreated)/Valid, $1/;
-    $user->_Set(
-        Field => 'Comments',
-        Value => $user_comments
-    );
+    $user_comments = 'Valid, ' . $user_comments;
+    $user->SetComments($user_comments);
     return $user;
 }
 
