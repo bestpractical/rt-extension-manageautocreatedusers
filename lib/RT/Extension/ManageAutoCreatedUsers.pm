@@ -69,7 +69,6 @@ sub _do_merge {
     my $new_user = RT::User->new(RT->SystemUser);
     $new_user->LoadByCol('EmailAddress' => $new_email_address);
     if ( $new_user->id ) {
-        $user = $class->_do_validate($user);
         $user->MergeInto($new_user);
     }
     return $new_user;
