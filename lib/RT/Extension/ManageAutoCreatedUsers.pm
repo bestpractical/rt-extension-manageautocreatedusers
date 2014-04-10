@@ -70,8 +70,9 @@ sub _do_merge {
     $new_user->LoadByCol('EmailAddress' => $new_email_address);
     if ( $new_user->id ) {
         $user->MergeInto($new_user);
+        return $new_user;
     }
-    return $new_user;
+    return [0, 'New user not found'];
 }
 
 sub process_form {
