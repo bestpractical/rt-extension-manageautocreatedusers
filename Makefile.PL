@@ -9,6 +9,8 @@ requires_rt '4.2.0';
 requires 'RT::Extension::MergeUsers';
 requires 'Email::Address';
 requires 'Email::Valid';
+requires 'Module::Runtime';
+
 test_requires 'Test::More';
 
 sign;

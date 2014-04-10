@@ -5,6 +5,8 @@ use warnings;
 use Email::Address;
 use RT::Extension::MergeUsers;
 use Email::Valid;
+use Scalar::Util 'blessed';
+use Module::Runtime 'use_module';
 
 our $VERSION = '0.01';
 
@@ -63,14 +65,46 @@ sub _do_validate {
 }
 
 sub _do_merge {
-    my ( $class, $user, $new_email_address ) = @_;
-    return unless Email::Valid->address($new_email_address);
-
-    my $new_user = RT::User->new(RT->SystemUser);
-    $new_user->LoadByCol('EmailAddress' => $new_email_address);
+    my ( $class, $user, $new_user ) = @_;
     if ( $new_user->id ) {
         $user->MergeInto($new_user);
         return $new_user;
+    }
+    return [0, 'New user not found'];
+}
+
+sub _do_replace {
+    my ( $class, $user, $new_user ) = @_;
+    if ( $new_user->id ) {
+        my $shred_plugin = use_module('RT::Shredder::Plugin::Users')->new;
+        my ( $test_status, $msg ) = $shred_plugin->TestArgs(
+            status => 'any',
+            name => $user->Name,
+            replace_relations => $new_user->id,
+        );
+        if ( $test_status )  {
+            my ( $run_status, @objs) = $shred_plugin->Run;
+            if ( $run_status ) {
+                my $shredder = use_module('RT::Shredder')->new;
+                @objs = $shredder->CastObjectsToRecords( Objects => \@objs );
+                my ( $resolver_status, $msg) = $shred_plugin->SetResolvers(
+                    Shredder => $shredder
+                );
+                if ( $resolver_status ) {
+                    $shredder->Wipeout(Object => $_) for @objs;
+                    return $new_user;
+                }
+                else {
+                    return [$resolver_status, $msg];
+                }
+            }
+            else {
+                return [$run_status, @objs];
+            }
+        }
+        else {
+            return [$test_status, $msg];
+        }
     }
     return [0, 'New user not found'];
 }
@@ -85,12 +119,23 @@ sub process_form {
     foreach (keys %$args) {
         if (/^action\-(\d+)/) {
             my $user_id = $1;
+            my $new_email_address = $args->{
+                join q{-}, 'merge-user', $user_id
+            };
+            next if $new_email_address
+                && !Email::Valid->address($new_email_address);
+
+            my $new_user = RT::User->new(RT->SystemUser);
+            $new_user->LoadByCol('EmailAddress' => $new_email_address);
             my $user = RT::User->new(RT->SystemUser);
             $user->Load($user_id);
-            if ( $user->id && (my $do_action = $action_map->{ $args->{$_} }) ) {
-                my $new_email_address = $args->{ join q{-}, 'merge-user', $user_id };
+            my $action = $args->{$_};
+            if ( $user->id && (my $do_action = $action_map->{$action}) ) {
                 if ( $do_action = $class->can($do_action) ) {
-                    $do_action->($class, $user, $new_email_address);
+                    my $return = $do_action->($class, $user, $new_user);
+                    RT->Logger->warn(
+                        "Error to $action user $user_id: " . $return->[1]
+                    ) unless blessed($return);
                 }
             }
         }
