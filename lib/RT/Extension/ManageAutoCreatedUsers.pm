@@ -71,6 +71,7 @@ sub _do_merge {
     my ( $class, $user, $new_email_address ) = @_;
     my $new_user = $class->_get_user_by_email($new_email_address);
     if ( $new_user->id ) {
+        $user = $class->_do_validate($user);
         $user->MergeInto($new_user);
         return $new_user;
     }
@@ -150,6 +151,17 @@ sub process_form {
         }
     }
 }
+
+package RT::User;
+
+use Class::Method::Modifiers;
+
+after UnMerge => sub {
+    my $self = shift;
+    my $user_comments = $self->Comments;
+    $user_comments =~ s/Valid,\s+//;
+    $self->SetComments($user_comments);
+};
 
 =head1 NAME
 

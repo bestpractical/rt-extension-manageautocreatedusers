@@ -9,6 +9,7 @@ requires_rt '4.2.0';
 requires 'RT::Extension::MergeUsers';
 requires 'Email::Address';
 requires 'Module::Runtime';
+requires 'Class::Method::Modifiers';
 
 test_requires 'Test::More';
 
