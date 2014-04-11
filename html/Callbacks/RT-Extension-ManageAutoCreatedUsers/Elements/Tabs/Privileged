@@ -1,5 +1,10 @@
 <%init>
-    my $admin_tools = Menu->child('admin')->child('tools');
+    my $admin = Menu->child('admin');
+    return unless $admin;
+
+    my $admin_tools = $admin->child('tools');
+    return unless $admin_tools;
+
     $admin_tools->child( 'autocreated-users' =>
         title       => loc('Auto-created Users'),
         description => loc('Manage auto-created users'),
