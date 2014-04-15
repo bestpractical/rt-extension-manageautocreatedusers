@@ -33,7 +33,7 @@ my $users = $manager->get_autocreated_users;
 <& /Elements/CollectionList,
     OrderBy => 'Name',
     Order => 'ASC',
-    Rows  => 100,
+    Rows  => 25,
     %ARGS,
     Format => $Format,
     Collection => $users,
