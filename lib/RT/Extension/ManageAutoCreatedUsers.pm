@@ -32,21 +32,12 @@ sub get_watching_tickets_for {
 
 sub get_merge_suggestion_for {
     my ( $class, $email_address ) = @_;
-    my $address = Email::Address->new(undef, $email_address);
-    my $username = $address->user;
     my $mail_domain = RT->Config->Get('RTxAutoUserMailDomain');
+    return unless $mail_domain;
 
+    $email_address =~ s/\@.*/\@$mail_domain/;
     my $users = RT::Users->new(RT->SystemUser);
-    $users->Limit(
-        FIELD => 'EmailAddress',
-        OPERATOR => 'ENDSWITH',
-        VALUE => $mail_domain,
-    );
-    while ( my $user = $users->Next ) {
-        return $user if $user->EmailAddress =~ qr{$username};
-    }
-
-    $users->GotoFirstItem;
+    $users->LimitToEmail($email_address);
     return $users->First;
 }
 

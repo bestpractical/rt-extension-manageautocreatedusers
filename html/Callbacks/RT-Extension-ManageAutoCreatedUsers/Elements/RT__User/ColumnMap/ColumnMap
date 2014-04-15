@@ -39,7 +39,7 @@ $COLUMN_MAP->{'MergeUser'} = {
             my $user = shift;
             my $user_id = $user->id;
             my $suggested_user = $manager->get_merge_suggestion_for($user->EmailAddress);
-            my $field_value = $suggested_user->EmailAddress;
+            my $field_value = $suggested_user ? $suggested_user->EmailAddress : q{};
             return \qq{<input name="merge-user-${user_id}" data-autocomplete="Users" data-autocomplete-return="Email" value="" size="40" placeholder="${field_value}" />};
         },
     };
