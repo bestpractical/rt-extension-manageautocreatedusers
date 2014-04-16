@@ -1,0 +1,4 @@
+- If the dropdown changes to either "replace" or "merge", could we get
+the suggestion to become the value?
+- shred action: drop the dependets first then shred the user
+- status message on POST
