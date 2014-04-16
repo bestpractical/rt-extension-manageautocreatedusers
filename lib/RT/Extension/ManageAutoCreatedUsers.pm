@@ -2,7 +2,6 @@ package RT::Extension::ManageAutoCreatedUsers;
 
 use strict;
 use warnings;
-use Email::Address;
 use RT::Extension::MergeUsers;
 use Scalar::Util 'blessed';
 use Module::Runtime 'use_module';
