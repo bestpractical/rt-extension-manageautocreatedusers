@@ -6,7 +6,9 @@ use RT::Extension::MergeUsers;
 use Scalar::Util 'blessed';
 use Module::Runtime 'use_module';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
+
+RT->AddJavaScript('manage-autocreated-users.js');
 
 sub get_autocreated_users {
     my $class = shift;

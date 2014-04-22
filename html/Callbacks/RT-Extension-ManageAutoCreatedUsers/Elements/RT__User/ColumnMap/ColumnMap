@@ -26,7 +26,7 @@ $COLUMN_MAP->{'Action'} = {
         title => 'Action', # loc
         value => sub {
             my $user_id = $_[0]->id;
-            my @res = (\qq{<select name="action-${user_id}">});
+            my @res = (\qq{<select name="action-${user_id}" data-autocreated-userid="$user_id">});
             my @actions = $manager->get_list_of_actions;
             foreach my $op_value (@actions) {
                 my $op_label = ucfirst $op_value;
@@ -43,7 +43,7 @@ $COLUMN_MAP->{'MergeUser'} = {
             my $user_id = $user->id;
             my $suggested_user = $manager->get_merge_suggestion_for($user->EmailAddress);
             my $field_value = $suggested_user ? $suggested_user->EmailAddress || $suggested_user->Name : q{};
-            return \qq{<input name="merge-user-${user_id}" data-autocomplete="Users" data-autocomplete-return="Email" value="" size="40" placeholder="${field_value}" />};
+            return \qq{<input name="merge-user-${user_id}" data-autocomplete="Users" data-autocomplete-return="Email" size="40" placeholder="${field_value}" />};
         },
     };
 </%init>
