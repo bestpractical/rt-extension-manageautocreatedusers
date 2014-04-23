@@ -109,11 +109,13 @@ sub _do_replace {
 
 sub process_form {
     my ( $class, $args ) = @_;
+    my $sys_user = RT->SystemUser;
     my $action_map = {
         map {
             $_ => join(q{_}, '_do', $_)
         } $class->get_list_of_actions
     };
+    my @results;
     ACTION : foreach my $param (grep { /^action/ } keys %$args) {
         my $action = $args->{$param};
         next ACTION if $action eq 'no-action';
@@ -125,7 +127,7 @@ sub process_form {
         }
 
         my ( $user_id ) = $param =~ /^action-(\d+)/;
-        my $user = RT::User->new(RT->SystemUser);
+        my $user = RT::User->new($sys_user);
         $user->Load($user_id);
         unless ( $user->id ) {
             RT->Logger->warn("Error loading the user: $user_id");
@@ -137,11 +139,23 @@ sub process_form {
                 join q{-}, 'merge-user', $user_id
             };
             my $return = $code_ref->($class, $user, $new_email_address);
-            RT->Logger->warn(
-                "Error to $action user $user_id: " . $return->[1]
-            ) unless blessed($return);
+            if ( blessed $return ) {
+                push @results, $sys_user->loc(
+                    ucfirst($action) . ': [_1] [_2]',
+                    ($user->EmailAddress || $user->Name),
+                    $action =~ /replace|merge/ ?
+                        ' => ' . $return->EmailAddress || $return->Name
+                        : q{},
+                );
+            }
+            else {
+                RT->Logger->warn(
+                    "Error to $action user $user_id: " . $return->[1]
+                );
+            }
         }
     }
+    return @results;
 }
 
 package RT::User;
