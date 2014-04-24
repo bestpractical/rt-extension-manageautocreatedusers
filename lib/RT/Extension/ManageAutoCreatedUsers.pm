@@ -82,41 +82,26 @@ sub _do_shred {
         if ($run_status) {
             my $shredder = use_module('RT::Shredder')->new;
             @objs = $shredder->CastObjectsToRecords(Objects => \@objs);
-            my ( $resolver_status, $msg ) = $tickets_shredder->SetResolvers(
-                Shredder => $shredder
+            $shredder->Wipeout(Object => $_) for @objs;
+
+            my $user_shredder = use_module('RT::Shredder::Plugin::Users')->new;
+            ( $test_status, $msg ) = $user_shredder->TestArgs(
+                status => 'any',
+                name => $user->Name,
             );
-            if ($resolver_status) {
-                $shredder->Wipeout(Object => $_) for @objs;
-                my $user_shredder = use_module('RT::Shredder::Plugin::Users')->new;
-                ( $test_status, $msg ) = $user_shredder->TestArgs(
-                    status => 'any',
-                    name => $user->Name,
-                );
-                if ($test_status) {
-                    ( $run_status, @objs ) = $user_shredder->Run;
-                    if ($run_status) {
-                        @objs = $shredder->CastObjectsToRecords(Objects => \@objs);
-                        ( $resolver_status, $msg ) = $user_shredder->SetResolvers(
-                            Shredder => $shredder
-                        );
-                        if ($resolver_status) {
-                            $shredder->Wipeout(Object => $_) for @objs;
-                            return $user;
-                        }
-                        else {
-                            return [$resolver_status, $msg];
-                        }
-                    }
-                    else {
-                        return [$run_status, 'User shredder failed on ->Run'];
-                    }
+            if ($test_status) {
+                ( $run_status, @objs ) = $user_shredder->Run;
+                if ($run_status) {
+                    @objs = $shredder->CastObjectsToRecords(Objects => \@objs);
+                    $shredder->Wipeout(Object => $_) for @objs;
+                    return $user;
                 }
                 else {
-                    return [$test_status, $msg];
+                    return [$run_status, 'User shredder failed on ->Run'];
                 }
             }
             else {
-                return [$resolver_status, $msg];
+                return [$test_status, $msg];
             }
         }
         else {
