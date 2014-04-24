@@ -72,10 +72,10 @@ sub _do_merge {
 
 sub _do_shred {
     my ( $class, $user ) = @_;
-    my $email_address = $user->EmailAddress || $user->Name;
+    my $user_id = $user->id;
     my $tickets_shredder = use_module('RT::Shredder::Plugin::Tickets')->new;
     my ( $test_status, $msg ) = $tickets_shredder->TestArgs(
-        query => qq{Requestor.EmailAddress = '$email_address'},
+        query => qq{Requestor.id = '$user_id'},
     );
     if ($test_status) {
         my ( $run_status, @objs ) = $tickets_shredder->Run;
