@@ -149,8 +149,12 @@ sub process_form {
                 );
             }
             else {
+                push @results, $sys_user->loc(
+                    "Failed to $action: [_1]",
+                    $user->EmailAddress || $user->Name,
+                );
                 RT->Logger->warn(
-                    "Error to $action user $user_id: " . $return->[1]
+                    "Error to $action user $user_id: " . join(q{ - }, @$return)
                 );
             }
         }
