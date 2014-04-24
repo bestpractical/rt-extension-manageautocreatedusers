@@ -97,7 +97,7 @@ sub _do_replace {
                 }
             }
             else {
-                return [$run_status, @objs];
+                return [$run_status, 'Users shredder failed on ->Run'];
             }
         }
         else {
