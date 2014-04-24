@@ -70,6 +70,64 @@ sub _do_merge {
     return [0, 'New user not found'];
 }
 
+sub _do_shred {
+    my ( $class, $user ) = @_;
+    my $email_address = $user->EmailAddress || $user->Name;
+    my $tickets_shredder = use_module('RT::Shredder::Plugin::Tickets')->new;
+    my ( $test_status, $msg ) = $tickets_shredder->TestArgs(
+        query => qq{Requestor.EmailAddress = '$email_address'},
+    );
+    if ($test_status) {
+        my ( $run_status, @objs ) = $tickets_shredder->Run;
+        if ($run_status) {
+            my $shredder = use_module('RT::Shredder')->new;
+            @objs = $shredder->CastObjectsToRecords(Objects => \@objs);
+            my ( $resolver_status, $msg ) = $tickets_shredder->SetResolvers(
+                Shredder => $shredder
+            );
+            if ($resolver_status) {
+                $shredder->Wipeout(Object => $_) for @objs;
+                my $user_shredder = use_module('RT::Shredder::Plugin::Users')->new;
+                ( $test_status, $msg ) = $user_shredder->TestArgs(
+                    status => 'any',
+                    name => $user->Name,
+                );
+                if ($test_status) {
+                    ( $run_status, @objs ) = $user_shredder->Run;
+                    if ($run_status) {
+                        @objs = $shredder->CastObjectsToRecords(Objects => \@objs);
+                        ( $resolver_status, $msg ) = $user_shredder->SetResolvers(
+                            Shredder => $shredder
+                        );
+                        if ($resolver_status) {
+                            $shredder->Wipeout(Object => $_) for @objs;
+                            return $user;
+                        }
+                        else {
+                            return [$resolver_status, $msg];
+                        }
+                    }
+                    else {
+                        return [$run_status, 'User shredder failed on ->Run'];
+                    }
+                }
+                else {
+                    return [$test_status, $msg];
+                }
+            }
+            else {
+                return [$resolver_status, $msg];
+            }
+        }
+        else {
+            return [$run_status, 'Tickets shredder failed on ->Run'];
+        }
+    }
+    else {
+        return [$test_status, $msg];
+    }
+}
+
 sub _do_replace {
     my ( $class, $user, $new_email_address ) = @_;
     my $new_user = $class->_get_user_by_email($new_email_address);
