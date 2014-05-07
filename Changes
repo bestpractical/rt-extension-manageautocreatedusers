@@ -1,4 +1,9 @@
 Revision history for RT-Extension-ManageAutoCreatedUsers
 
-0.01 [Release Date]
+0.02     2014-05-07
+ - Implement shred action
+ - Auto-promote merge-into input placeholder to value
+ - Display messages (error or success) on POST
+
+0.01     2014-03-28
  - Initial version
