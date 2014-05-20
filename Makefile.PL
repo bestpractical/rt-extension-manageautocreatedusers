@@ -12,6 +12,8 @@ requires 'Class::Method::Modifiers';
 
 test_requires 'Test::More';
 
+no_index 'package' => 'RT::User';
+
 sign;
 auto_install;
 WriteAll;
