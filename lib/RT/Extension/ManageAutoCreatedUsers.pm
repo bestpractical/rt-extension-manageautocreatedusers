@@ -6,7 +6,7 @@ use RT::Extension::MergeUsers;
 use Scalar::Util 'blessed';
 use Module::Runtime 'use_module';
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 RT->AddJavaScript('manage-autocreated-users.js');
 
