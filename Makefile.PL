@@ -6,7 +6,7 @@ readme_from 'lib/RT/Extension/ManageAutoCreatedUsers.pm';
 license  'gplv2';
 
 requires_rt '4.2.0';
-requires 'RT::Extension::MergeUsers';
+requires_rt_plugin 'RT::Extension::MergeUsers';
 requires 'Module::Runtime';
 requires 'Class::Method::Modifiers';
 
