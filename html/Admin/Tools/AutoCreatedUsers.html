@@ -30,7 +30,8 @@ my $users = $manager->get_autocreated_users;
 
 % if ( $users->Count ) {
 
-<form name="manage-autocreated-users" action="" method="POST">
+<form name="manage-autocreated-users" action="<%RT->Config->Get('WebPath')%>/Admin/Tools/AutoCreatedUsers.html" method="POST">
+<input name="Page" type="hidden" value="<% $ARGS{'Page'} %>">
 <& /Elements/CollectionList,
     OrderBy => 'Name',
     Order => 'ASC',
