@@ -34,7 +34,7 @@ my $users = $manager->get_autocreated_users;
 <& /Elements/CollectionList,
     OrderBy => 'Name',
     Order => 'ASC',
-    Rows  => 25,
+    Rows  => RT->Config->Get('RTxAutoUserRows') || 25,
     %ARGS,
     Format => $Format,
     Collection => $users,
