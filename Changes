@@ -1,5 +1,9 @@
 Revision history for RT-Extension-ManageAutoCreatedUsers
 
+0.09     2014-08-28
+ - Parametrize the number of rows
+ - Fix POSTing for when CSRF token is involved
+
 0.08     2014-07-09
  - No code changes. Using new requires_rt_plugin helper.
 
