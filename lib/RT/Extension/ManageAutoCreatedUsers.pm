@@ -264,15 +264,12 @@ May need root permissions
 
 =item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
 
-If you are using RT 4.2 or greater, add this line:
-
-    Plugin('RT::Extension::ManageAutoCreatedUsers');
-
-For RT 3.8 and 4.0, add this line:
+Add this line:
 
     Set(@Plugins, qw(RT::Extension::ManageAutoCreatedUsers));
 
-or add C<RT::Extension::ManageAutoCreatedUsers> to your existing C<@Plugins> line.
+or add C<RT::Extension::ManageAutoCreatedUsers> to your existing C<@Plugins>
+line.
 
 =item Clear your mason cache
 
@@ -284,7 +281,7 @@ or add C<RT::Extension::ManageAutoCreatedUsers> to your existing C<@Plugins> lin
 
 =head1 AUTHOR
 
-Wallace Reis <wreis@cpan.org>
+Best Practical Solutions, LLC <modules@bestpractical.com>
 
 =head1 BUGS
 
