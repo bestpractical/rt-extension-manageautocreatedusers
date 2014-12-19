@@ -1,5 +1,9 @@
 Revision history for RT-Extension-ManageAutoCreatedUsers
 
+0.10     2014-12-19
+ - Doc Changes
+ - RTx() implies both all_from and readme_from
+
 0.09     2014-08-28
  - Parametrize the number of rows
  - Fix POSTing for when CSRF token is involved
