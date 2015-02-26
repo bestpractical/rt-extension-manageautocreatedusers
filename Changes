@@ -1,5 +1,8 @@
 Revision history for RT-Extension-ManageAutoCreatedUsers
 
+0.11     2015-02-26
+ - Meta changes
+
 0.10     2014-12-19
  - Doc Changes
  - RTx() implies both all_from and readme_from
