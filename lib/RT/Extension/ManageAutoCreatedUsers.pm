@@ -281,18 +281,24 @@ line.
 
 =head1 AUTHOR
 
-Best Practical Solutions, LLC <modules@bestpractical.com>
+Best Practical Solutions, LLC E<lt>modules@bestpractical.comE<gt>
 
 =head1 BUGS
 
-All bugs should be reported via email to
-L<bug-RT-Extension-ManageAutoCreatedUsers@rt.cpan.org|mailto:bug-RT-Extension-ManageAutoCreatedUsers@rt.cpan.org>
-or via the web at
-L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-ManageAutoCreatedUsers>.
+=for html <p>All bugs should be reported via email to <a
+href="mailto:bug-RT-Extension-ManageAutoCreatedUsers@rt.cpan.org">bug-RT-Extension-ManageAutoCreatedUsers@rt.cpan.org</a>
+or via the web at <a
+href="http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-ManageAutoCreatedUsers">rt.cpan.org</a>.</p>
+
+=for text
+    All bugs should be reported via email to
+        bug-RT-Extension-ManageAutoCreatedUsers@rt.cpan.org
+    or via the web at
+        http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-ManageAutoCreatedUsers
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright Best Practical Solutions, LLC.
+This software is Copyright (c) 2007-2014 by Best Practical Solutions, LLC
 
 This is free software, licensed under:
 
